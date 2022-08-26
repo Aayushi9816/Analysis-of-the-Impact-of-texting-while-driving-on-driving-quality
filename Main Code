@@ -1,0 +1,170 @@
+#Setting the working directory
+setwd("~/R/Assignment 2")
+
+#This is to read the file 
+drivingdata <- read.csv("~/R/Assignment 2/driving(1).xls")
+
+#Viewing the dataset 
+View(drivingdata)
+
+#The dataset has 32 participants, with 3 data participant, condition and scor
+e.
+
+#Head of dataset
+head(drivingdata)
+
+#Tail of dataset
+tail(drivingdata)
+
+#Using the "levels" command, so that R treats condition as a factor.
+drivingdata$condition= factor(drivingdata$condition)
+
+#Checking what the levels are
+levels(drivingdata$condition)
+
+##Using the subset command, we can get Dataframes that are smaller chunks of
+##the full Dataframe, specifying particular conditions we want our subset to
+## have.
+control = subset (drivingdata$score, drivingdata$condition=="control")
+control
+
+texting = subset (drivingdata$score, drivingdata$condition=="text")
+texting
+
+#Descriptive Statistics:
+## Scores overall as well as descriptive of scores in each condtions
+
+mean (drivingdata$score);
+## [1] 4.4475
+sd (drivingdata$score); 
+## [1] 1.599879
+max (drivingdata$score); 
+## [1] 7.14
+min (drivingdata$score); 
+## [1] 0.33
+median(drivingdata$score); 
+## [1] 4.79
+IQR(drivingdata$score);
+## [1] 1.6425
+mean (control); 
+## [1] 5.138125
+sd (control); 
+## [1] 1.287303
+max (control); 
+## [1] 7.14
+min (control); 
+## [1] 2.15
+median(control);
+## [1] 5.2
+IQR(control);
+## [1] 2.0125
+mean (texting); 
+## [1] 3.756875
+sd (texting); 
+## [1] 1.617157
+max (texting); 
+## [1] 6.41
+min (texting); 
+## [1] 0.33
+median(texting); 
+## [1] 3.93
+IQR(texting)
+## [1] 1.955
+
+#Boxplot for each condition and for the overall score.
+boxplot (drivingdata$score,main="boxplot of driving scores", ylim= c(0,8), yl
+ab = "Score")
+
+boxplot(drivingdata$score~drivingdata$condition, main="boxplot of driving sco
+res by condition", ylim= c(0,8),xlab = "condition", ylab = "Score")
+
+which(drivingdata$score == min(drivingdata$score))
+## [1] 31
+drivingdata[31,3]
+## [1] 0.33
+
+hist (control, xlab="driving Scores", main="Driving Quality scores for textin
+g (green) and control (blue) conditions", xlim=c(0,8), breaks=seq(0,8,1), col
+=(blues9))
+hist (texting, breaks=seq(0,8,1), col=rgb(0,1,0,1/3), add=TRUE)
+
+#We are checking for the normality distribution(Shapiro wilk test)
+shapiro.test (control)
+## 
+## Shapiro-Wilk normality test
+## 
+## data: control
+## W = 0.95842, p-value = 0.6332
+#p-value = 0.6332
+shapiro.test (texting)
+## 
+## Shapiro-Wilk normality test
+## 
+## data: texting
+## W = 0.96804, p-value = 0.806
+#p-value = 0.806
+#Let us perform the Levene's test
+install.packages ('car')
+library ('car')
+
+#We are checking for the normality distribution(Shapiro wilk test)
+shapiro.test (control)
+## 
+## Shapiro-Wilk normality test
+## 
+## data: control
+## W = 0.95842, p-value = 0.6332
+#p-value = 0.6332
+shapiro.test (texting)
+## 
+## Shapiro-Wilk normality test
+## 
+## data: texting
+## W = 0.96804, p-value = 0.806
+#p-value = 0.806
+#Let us perform the Levene's test
+install.packages ('car')
+library ('car')
+
+## Levene's Test for Homogeneity of Variance (center = median)
+## Df F value Pr(>F)
+## group 1 0.9755 0.3312
+## 30
+#f value 0.3101
+
+t.test (control, texting, paired=FALSE)
+
+## 
+## Welch Two Sample t-test
+## 
+## data: control and texting
+## t = 2.673, df = 28.564, p-value = 0.01229
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+## 0.3236936 2.4388064
+## sample estimates:
+## mean of x mean of y 
+## 5.138125 3.756875
+
+#Welch Two Sample t-test
+drivingdata.mean = c( mean(control), mean(texting) )
+drivingdata.sd = c( sd(control), sd(texting) )
+names(drivingdata.mean) = c("Control", "Texting")
+barplot (drivingdata.mean, main = "Graph of Condition Means", xlab= "Driving 
+Condition", ylab="Driving Score", ylim=c(0,8),col=c(col=rgb(1,.5,1,1),rgb(1,1
+,0,1)))
+
+se.bar = function(x, y, sds, n, upper=sds/sqrt(n), lower=upper, length=0.1,..
+.)
+{
+ if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != le
+ngth(upper))
+ stop("vectors must be same length")
+ 
+ arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length, ...)
+}
+br = barplot (drivingdata.mean, main = "Graph of Condition Means", xlab= "Dri
+ving Condition", ylab="Driving Score", ylim=c(0,8),col=c(col=rgb(1,1,0,1),rgb
+(1,.5,.5,1)))
+se.bar(br,drivingdata.mean,drivingdata.sd,16)
+
